@@ -38,8 +38,16 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
     private Image imaImagenJFrame; 
     private Graphics graGraficaJFrame;
     private Bola bolBola;
-    private Paddle padDrone;
     private LinkedList lnkBricks;
+    
+    //animacion
+    private Animacion animDrone;
+    private Paddle padDrone;
+    //Variables de control de tiempo de la animacion
+    private long tiempoActual;
+    private long tiempoInicial;
+    //posicion de la animacion
+    int iPosX, iPosY;
     
     public BrickingBad(){
         init();
@@ -71,13 +79,34 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         
         bolBola.setDirX(iVelocidad);
         bolBola.setDirY(iVelocidad);
+
+        //se cargan las imagenes de la animacions
+        Image imaDrone1 = Toolkit.getDefaultToolkit().getImage(
+                this.getClass().getResource("Player_DroneBase01.png"));
         
-        URL urlImagenDrone = this.getClass().getResource("drone.png");
-        padDrone = new Paddle(getWidth() / 2 , 50,
-                Toolkit.getDefaultToolkit().getImage(urlImagenDrone));
-        padDrone.setX((getWidth() / 2) -(padDrone.getAncho() / 2));
-                
-        bolBola.setY(padDrone.getY()+padDrone.getAlto());
+        Image imaDrone2 = Toolkit.getDefaultToolkit().getImage(
+                this.getClass().getResource("Player_DroneBase02.png"));
+        
+        Image imaDrone3 = Toolkit.getDefaultToolkit().getImage(
+                this.getClass().getResource("Player_DroneBase03.png"));
+               
+        //se crea la animacion
+        padDrone = new Paddle(0, 0);
+        padDrone.sumaCuadro(imaDrone1, 200);
+        padDrone.sumaCuadro(imaDrone2, 200);
+        padDrone.sumaCuadro(imaDrone3, 200);
+        padDrone.setX((getWidth() / 2) - 50);
+        padDrone.setY(50);
+        /*
+        animDrone = new Animacion(getWidth() / 2 , 50);
+        animDrone.sumaCuadro(imaDrone1, 200);
+        animDrone.sumaCuadro(imaDrone2, 200);
+        animDrone.sumaCuadro(imaDrone3, 200);
+        
+        animDrone.sumaCuadro(imaDrone2, 200);
+        animDrone.sumaCuadro(imaDrone1, 200);*/
+        
+        bolBola.setY(padDrone.getY()+20);
         bolBola.setX((getWidth() / 2) - (bolBola.getAncho() / 2));
         
         //creo imagen de Walt
@@ -144,6 +173,11 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
      */
     public void run () {
     
+         //Guarda el tiempo actual del sistema 
+        tiempoActual = System.currentTimeMillis();
+        //Ciclo principal del Applet. Actualiza y despliega en pantalla la 
+        //animación hasta que el Applet sea cerrado.
+        
         while(iVidas > 0){
             actualiza();
             checaColision();
@@ -169,15 +203,23 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         
         //Controlo la barra
         if(bIzq){
-            padDrone.setX(padDrone.getX() - padDrone.getVelociad());
+            //animDrone.setX(animDrone.getX() - 3);
+            padDrone.setX(padDrone.getX() - 3);
         }
         if(bDer) {
-            padDrone.setX(padDrone.getX() + padDrone.getVelociad());
+            //animDrone.setX(animDrone.getX() + 3);
+            padDrone.setX(padDrone.getX() + 3);
         }
         //la bola se mueve
         bolBola.muevete();      
         
-        
+        //Determina el tiempo que ha transcurrido desde que el Applet 
+        //inicio su ejecución
+        long tiempoTranscurrido=System.currentTimeMillis() - tiempoActual;
+        //Guarda el tiempo actual
+        tiempoActual += tiempoTranscurrido;
+        //Actualiza la animación en base al tiempo transcurrido
+        padDrone.actualiza(tiempoTranscurrido);
 
     }
 
@@ -193,8 +235,9 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         if(padDrone.getX()<0) {
             padDrone.setX(0);
         }
-        else if(padDrone.getX() + padDrone.getAncho() > getWidth()){
-            padDrone.setX(getWidth() - padDrone.getAncho());
+        else if(padDrone.getX() + padDrone.getImagen().getWidth(this) > 
+                getWidth()){
+            padDrone.setX(getWidth() - padDrone.getImagen().getWidth(this));
         }
         
         //Si choca la bola con el drone cambia de dir en y
@@ -229,7 +272,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
 
                     }
                     
-                    if(briBrick.colisionaPorAbajo(bolBola)){
+                    else if(briBrick.colisionaPorAbajo(bolBola)){
                         bolBola.setDirY(iVelocidad);
                         briBrick.agregarGolpe();
 
@@ -241,7 +284,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
 
                     }
                     
-                    if(briBrick.colisionaPorDer(bolBola)){
+                    else if(briBrick.colisionaPorDer(bolBola)){
                         bolBola.setDirX(iVelocidad);
                         briBrick.agregarGolpe();
 
@@ -297,9 +340,15 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         //Dibuja la imagen de la bola y barra
         g.drawImage(bolBola.getImagen(), bolBola.getX(),
                 bolBola.getY(), this);
-        g.drawImage(padDrone.getImagen(),padDrone.getX(), 
-                padDrone.getY(), this);
+        /*g.drawImage(padDrone.getImagen(),padDrone.getX(), 
+                padDrone.getY(), this);*/
         
+        // Muestra en pantalla el cuadro actual de la animación
+        if (padDrone != null) {    
+
+             g.drawImage(padDrone.getImagen(), padDrone.getX(),padDrone.getY() , this);
+        }
+                  
         //dibujo bloques
         for(Object briBloque:lnkBricks) {
             Brick briBrick = (Brick) briBloque;

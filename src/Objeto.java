@@ -34,6 +34,11 @@ public class Objeto {
         imiIcono = new ImageIcon(imaImagen);
     }
     
+    public Objeto(int iX, int iY){
+        this.iX = iX;
+        this.iY = iY;
+    }
+    
     /**
      * setX
      * 
