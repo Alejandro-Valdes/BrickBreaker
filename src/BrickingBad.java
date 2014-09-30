@@ -137,7 +137,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         //creo imagen de Jesse PinkMan
         URL urlImagenPinkman = this.getClass().getResource("pinkman.png");
         //creo imagen de Meth
-        URL urlImagenMeth = this.getClass().getResource("meth.png");
+        URL urlImagenMeth = this.getClass().getResource("Brick_BlueMethBaggie.png");
         //creo imagen de lab
         URL urlImagenLab = this.getClass().getResource("lab.png");
         
