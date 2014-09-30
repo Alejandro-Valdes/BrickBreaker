@@ -41,8 +41,10 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
     private LinkedList lnkBricks;
     
     //animacion
-    private Animacion animDrone;
     private Paddle padDrone;
+    private Paddle padDroneIzq;
+    private Paddle padDroneDer;
+    
     //Variables de control de tiempo de la animacion
     private long tiempoActual;
     private long tiempoInicial;
@@ -89,23 +91,44 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         
         Image imaDrone3 = Toolkit.getDefaultToolkit().getImage(
                 this.getClass().getResource("Player_DroneBase03.png"));
+
+        Image imaDroneIzq1 = Toolkit.getDefaultToolkit().getImage(
+                this.getClass().getResource("Player_DroneBaseLeft01.png"));
+        
+        Image imaDroneIzq2 = Toolkit.getDefaultToolkit().getImage(
+                this.getClass().getResource("Player_DroneBaseLeft02.png"));
+        
+        Image imaDroneIzq3 = Toolkit.getDefaultToolkit().getImage(
+                this.getClass().getResource("Player_DroneBaseLeft03.png"));
                
+        Image imaDroneDer1 = Toolkit.getDefaultToolkit().getImage(
+                this.getClass().getResource("Player_DroneBaseRight01.png"));
+        
+        Image imaDroneDer2 = Toolkit.getDefaultToolkit().getImage(
+                this.getClass().getResource("Player_DroneBaseRight02.png"));
+        
+        Image imaDroneDer3 = Toolkit.getDefaultToolkit().getImage(
+                this.getClass().getResource("Player_DroneBaseRight03.png"));
         //se crea la animacion
         padDrone = new Paddle(0, 0);
-        padDrone.sumaCuadro(imaDrone1, 200);
-        padDrone.sumaCuadro(imaDrone2, 200);
-        padDrone.sumaCuadro(imaDrone3, 200);
+        padDrone.sumaCuadro(imaDrone1, 50);
+        padDrone.sumaCuadro(imaDrone2, 50);
+        padDrone.sumaCuadro(imaDrone3, 50);
         padDrone.setX((getWidth() / 2) - 50);
         padDrone.setY(50);
-        /*
-        animDrone = new Animacion(getWidth() / 2 , 50);
-        animDrone.sumaCuadro(imaDrone1, 200);
-        animDrone.sumaCuadro(imaDrone2, 200);
-        animDrone.sumaCuadro(imaDrone3, 200);
         
-        animDrone.sumaCuadro(imaDrone2, 200);
-        animDrone.sumaCuadro(imaDrone1, 200);*/
+        //se crea animacion izq
+        padDroneIzq = new Paddle(0,0);
+        padDroneIzq.sumaCuadro(imaDroneIzq1, 50);
+        padDroneIzq.sumaCuadro(imaDroneIzq2, 50);
+        padDroneIzq.sumaCuadro(imaDroneIzq3, 50);
         
+        //se crea animacion der
+        padDroneDer = new Paddle(0,0);
+        padDroneDer.sumaCuadro(imaDroneDer1, 50);
+        padDroneDer.sumaCuadro(imaDroneDer2, 50);
+        padDroneDer.sumaCuadro(imaDroneDer3, 50);
+
         bolBola.setY(padDrone.getY()+20);
         bolBola.setX((getWidth() / 2) - (bolBola.getAncho() / 2));
         
@@ -138,7 +161,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
             }
             
             if(iI % 2 == 0){
-            Brick briBloque4 = new Brick(50 * iI, (getHeight() / 2) + 150 + 30,
+            Brick briBloque4 = new Brick(50 * iI, (getHeight() / 2) + 100 + 20,
                     3, Toolkit.getDefaultToolkit().getImage(urlImagenWalt));
             lnkBricks.add(briBloque4);
             }
@@ -220,6 +243,8 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         tiempoActual += tiempoTranscurrido;
         //Actualiza la animación en base al tiempo transcurrido
         padDrone.actualiza(tiempoTranscurrido);
+        padDroneIzq.actualiza(tiempoTranscurrido);
+        padDroneDer.actualiza(tiempoTranscurrido);
 
     }
 
@@ -278,7 +303,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
 
                     }
                     
-                    if(briBrick.colisionaPorIzq(bolBola)){
+                    else if(briBrick.colisionaPorIzq(bolBola)){
                         bolBola.setDirX(iVelocidad * - 1);
                         briBrick.agregarGolpe();
 
@@ -344,9 +369,20 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
                 padDrone.getY(), this);*/
         
         // Muestra en pantalla el cuadro actual de la animación
-        if (padDrone != null) {    
-
-             g.drawImage(padDrone.getImagen(), padDrone.getX(),padDrone.getY() , this);
+        if (padDrone != null && padDroneIzq != null &&
+                padDroneDer != null) {    
+            if(!bIzq && !bDer){
+                g.drawImage(padDrone.getImagen(), padDrone.getX(),
+                        padDrone.getY() , this);
+            }
+            else if(bIzq){
+                g.drawImage(padDroneIzq.getImagen(), padDrone.getX(),
+                        padDrone.getY() , this);
+            }
+            else if(bDer) {
+                g.drawImage(padDroneDer.getImagen(), padDrone.getX(),
+                        padDrone.getY() , this);
+            }
         }
                   
         //dibujo bloques
