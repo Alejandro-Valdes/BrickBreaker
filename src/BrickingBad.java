@@ -92,9 +92,9 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
                
         //se crea la animacion
         padDrone = new Paddle(0, 0);
-        padDrone.sumaCuadro(imaDrone1, 200);
-        padDrone.sumaCuadro(imaDrone2, 200);
-        padDrone.sumaCuadro(imaDrone3, 200);
+        padDrone.sumaCuadro(imaDrone1, 50);
+        padDrone.sumaCuadro(imaDrone2, 50);
+        padDrone.sumaCuadro(imaDrone3, 50);
         padDrone.setX((getWidth() / 2) - 50);
         padDrone.setY(50);
         /*
