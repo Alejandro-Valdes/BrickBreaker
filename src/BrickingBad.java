@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -13,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,12 +37,15 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
     private int iVelocidad;
     private boolean bIzq;
     private boolean bDer;
+    private boolean bJuega;
     private Image imaImagenJFrame; 
     private Graphics graGraficaJFrame;
     private Bola bolBola;
     private LinkedList lnkBricks;
+    private Boss bossTuco;
+    private boolean bPausa;
     
-    //animacion
+    //animacion clase Paddle extiende case animacion
     private Paddle padDrone;
     private Paddle padDroneIzq;
     private Paddle padDroneDer;
@@ -72,11 +77,13 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         bIzq = false;
         bDer = false;
         lnkBricks = new LinkedList();
+        bJuega = false;
+        bPausa = false;
                 
         URL urlImagenBola = this.getClass().getResource("dea.png");
      
-        // Creo el objeto peloa
-        bolBola = new Bola(getWidth() / 2, 70, 
+        // Creo el objeto bola
+        bolBola = new Bola(getWidth() / 2, 150, 
                 Toolkit.getDefaultToolkit().getImage(urlImagenBola));
         
         bolBola.setDirX(iVelocidad);
@@ -129,7 +136,8 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         padDroneDer.sumaCuadro(imaDroneDer2, 50);
         padDroneDer.sumaCuadro(imaDroneDer3, 50);
 
-        bolBola.setY(padDrone.getY()+20);
+        bolBola.setY(padDrone.getY() + padDrone.getImagen().getHeight(null) 
+                + 45);
         bolBola.setX((getWidth() / 2) - (bolBola.getAncho() / 2));
         
         //creo imagen de Walt
@@ -147,11 +155,11 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         */
         for(int iI = 0; iI < 10; iI++){
             Brick briBloque = new Brick(50 * iI, (getHeight() / 2) ,
-                    1, Toolkit.getDefaultToolkit().getImage(urlImagenMeth));
+                    3, Toolkit.getDefaultToolkit().getImage(urlImagenMeth));
             lnkBricks.add(briBloque);
             
             Brick briBloque2 = new Brick(50 * iI, (getHeight() / 2) + 50 + 10,
-                    1, Toolkit.getDefaultToolkit().getImage(urlImagenLab));
+                    3, Toolkit.getDefaultToolkit().getImage(urlImagenLab));
             lnkBricks.add(briBloque2);
             
             if(iI % 2 != 0){
@@ -167,6 +175,22 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
             }
             
         }
+        
+        //Agrego imagenes de bosses
+        URL urlTuco1 = this.getClass().getResource("Character_Tuco01.png");
+        URL urlTuco2 = this.getClass().getResource("Character_Tuco02.png");
+        URL urlTuco3 = this.getClass().getResource("Character_Tuco03.png");
+        URL urlTuco4 = this.getClass().getResource("Character_Tuco04.png");
+        URL urlTuco5 = this.getClass().getResource("Character_Tuco05.png");
+
+        bossTuco = new Boss(getWidth() / 2 -25, 200,
+            5, Toolkit.getDefaultToolkit().getImage(urlTuco1));
+       
+        bossTuco.agregaFase(Toolkit.getDefaultToolkit().getImage(urlTuco2));
+        bossTuco.agregaFase(Toolkit.getDefaultToolkit().getImage(urlTuco3));
+        bossTuco.agregaFase(Toolkit.getDefaultToolkit().getImage(urlTuco4));
+        bossTuco.agregaFase(Toolkit.getDefaultToolkit().getImage(urlTuco5));
+        
         addKeyListener(this);
     }
     
@@ -202,10 +226,13 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         //animación hasta que el Applet sea cerrado.
         
         while(iVidas > 0){
-            actualiza();
-            checaColision();
-            repaint();
-
+            
+            if(!bPausa){
+                actualiza();
+                checaColision();
+                repaint();
+            }
+           
             try	{  
                 // El thread se duerme.
                 Thread.sleep (20);
@@ -222,20 +249,27 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
      * Metodo que actualiza la posicion de los objetos  
      * 
      */
-    public void actualiza(){
-        
+    public void actualiza(){  
+            
         //Controlo la barra
         if(bIzq){
-            //animDrone.setX(animDrone.getX() - 3);
             padDrone.setX(padDrone.getX() - 3);
+            if(!bJuega){
+                bolBola.setX(bolBola.getX() - 3);
+            }
         }
         if(bDer) {
-            //animDrone.setX(animDrone.getX() + 3);
             padDrone.setX(padDrone.getX() + 3);
+            if(!bJuega){
+                bolBola.setX(bolBola.getX() + 3);
+            }
         }
-        //la bola se mueve
-        bolBola.muevete();      
         
+        if(bJuega){
+            //la bola se mueve
+            bolBola.muevete();     
+        }
+
         //Determina el tiempo que ha transcurrido desde que el Applet 
         //inicio su ejecución
         long tiempoTranscurrido=System.currentTimeMillis() - tiempoActual;
@@ -246,6 +280,8 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         padDroneIzq.actualiza(tiempoTranscurrido);
         padDroneDer.actualiza(tiempoTranscurrido);
 
+        bossTuco.actualizaFase(bossTuco.getGolpes());
+        
     }
 
     /**
@@ -278,9 +314,17 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         else if(bolBola.getX() > getWidth() - bolBola.getAncho()){
             bolBola.setDirX(iVelocidad * -1);
         }
-        //Tener que cambiar para checar con drone
-        if(bolBola.getY() < 0){
-            bolBola.setDirY(iVelocidad);
+        //si se le va la bola al drone
+        if(bolBola.getY() < padDrone.getY() + padDrone.getImagen().
+                getHeight(null) - 10){
+            iVidas--; //resto vidas
+            //acomodo como al principio
+            bolBola.setY(padDrone.getY()+padDrone.getImagen().getHeight(null));
+            bolBola.setX((getWidth() / 2) - (bolBola.getAncho() / 2));
+            padDrone.setX((getWidth() / 2) - 50);
+            padDrone.setY(50);
+            //empiezas a jugar una vez mas con space
+            bJuega = false;      
         }
         //si se va a slair la bola por abajo rebota
         else if(bolBola.getY() > getHeight() - bolBola.getAlto()){
@@ -294,28 +338,58 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
                     if(briBrick.colisionaPorArriba(bolBola)){
                         bolBola.setDirY(iVelocidad * -1);
                         briBrick.agregarGolpe();
+                        iScore += 20;
 
                     }
                     
                     else if(briBrick.colisionaPorAbajo(bolBola)){
                         bolBola.setDirY(iVelocidad);
                         briBrick.agregarGolpe();
-
+                        iScore += 20;        
                     }
                     
                     else if(briBrick.colisionaPorIzq(bolBola)){
                         bolBola.setDirX(iVelocidad * - 1);
                         briBrick.agregarGolpe();
+                        iScore += 20;
 
                     }
                     
                     else if(briBrick.colisionaPorDer(bolBola)){
                         bolBola.setDirX(iVelocidad);
                         briBrick.agregarGolpe();
+                        iScore += 20;
 
                     }
             }
         }
+        
+        if(!bossTuco.estaDestruido()){
+                if(bossTuco.colisionaPorArriba(bolBola)){
+                    bolBola.setDirY(iVelocidad * -1);
+                    bossTuco.agregarGolpe();
+                    iScore += 40;
+
+                }
+                    
+                else if(bossTuco.colisionaPorAbajo(bolBola)){
+                    bolBola.setDirY(iVelocidad);
+                    bossTuco.agregarGolpe();
+                    iScore += 40;
+                }
+
+                else if(bossTuco.colisionaPorIzq(bolBola)){
+                    bolBola.setDirX(iVelocidad * - 1);
+                    bossTuco.agregarGolpe();
+                    iScore += 40;
+                }
+
+                else if(bossTuco.colisionaPorDer(bolBola)){
+                    bolBola.setDirX(iVelocidad);
+                    bossTuco.agregarGolpe();
+                    iScore += 40;
+                }
+            }
     }
     
     /**
@@ -342,10 +416,21 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         Image imaImagenFondo = Toolkit.getDefaultToolkit().
                 getImage(urlImagenFondo);
         
+        // creo imagen GAME OVER
+        URL urlImagenGameOver = this.getClass().getResource("gameover.png");
+        Image imaImagenGameOver = Toolkit.getDefaultToolkit().
+                getImage(urlImagenGameOver);
+        
         //Despliego la imagen
         graGraficaJFrame.drawImage(imaImagenFondo, 0, 0, 
                 getWidth(), getHeight(), this);
         
+        // Despliego Game Over si ya no hay vidas
+        if (iVidas == 0) {
+            graGraficaJFrame.drawImage(imaImagenGameOver, 0, 0, 
+                getWidth(), getHeight(), this);   
+        }
+            
         //Actualiza el Foreground
         graGraficaJFrame.setColor(getForeground());
         paint1(graGraficaJFrame);
@@ -362,37 +447,56 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
      */    
     public void paint1(Graphics g) 
     {
-        //Dibuja la imagen de la bola y barra
-        g.drawImage(bolBola.getImagen(), bolBola.getX(),
+        if(iVidas != 0){
+            
+            //Dibuja la imagen de la bola y barra
+            g.drawImage(bolBola.getImagen(), bolBola.getX(),
                 bolBola.getY(), this);
-        /*g.drawImage(padDrone.getImagen(),padDrone.getX(), 
-                padDrone.getY(), this);*/
         
-        // Muestra en pantalla el cuadro actual de la animación
-        if (padDrone != null && padDroneIzq != null &&
-                padDroneDer != null) {    
-            if(!bIzq && !bDer){
-                g.drawImage(padDrone.getImagen(), padDrone.getX(),
+            // Muestra en pantalla el cuadro actual de la animación
+            if (padDrone != null && padDroneIzq != null &&
+                padDroneDer != null) { 
+   
+                if(!bIzq && !bDer){
+                    g.drawImage(padDrone.getImagen(), padDrone.getX(),
+                            padDrone.getY() , this);
+                }
+                //TEMPORAL FIX
+                else if(bIzq){
+                    g.drawImage(padDroneDer.getImagen(), padDrone.getX(),
                         padDrone.getY() , this);
-            }
-            else if(bIzq){
-                g.drawImage(padDroneIzq.getImagen(), padDrone.getX(),
+                }
+                else if(bDer) {
+                    g.drawImage(padDroneIzq.getImagen(), padDrone.getX(),
                         padDrone.getY() , this);
+                }
             }
-            else if(bDer) {
-                g.drawImage(padDroneDer.getImagen(), padDrone.getX(),
-                        padDrone.getY() , this);
-            }
-        }
                   
-        //dibujo bloques
-        for(Object briBloque:lnkBricks) {
-            Brick briBrick = (Brick) briBloque;
-            if(!briBrick.estaDestruido()){
-                g.drawImage(briBrick.getImagen(), briBrick.getX(), 
-                      briBrick.getY(), this);
+            //dibujo bloques
+            for(Object briBloque:lnkBricks) {
+                Brick briBrick = (Brick) briBloque;
+                if(!briBrick.estaDestruido()){
+                    g.drawImage(briBrick.getImagen(), briBrick.getX(), 
+                          briBrick.getY(), this);
+                }
             }
+
+            //Dibujo de boss
+            if(!bossTuco.estaDestruido()){
+                g.drawImage(bossTuco.getImagen(), bossTuco.getX(), 
+                          bossTuco.getY(), this);
+            }
+            
         }
+        
+        //despliego informacion necesaria
+        if(iVidas > 0){
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("TimesRoman", Font.BOLD, 20));
+            g.drawString("S C O R E: " + iScore, 10, getHeight() - 20);
+            g.drawString("L I V E S: " + iVidas, 10, getHeight() - 40);
+        }
+            
     }
     
     @Override
@@ -418,6 +522,13 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         }
         else if(ke.getKeyCode() == ke.VK_RIGHT){
             bDer = false;
+        }
+        else if(ke.getKeyCode() == ke.VK_SPACE){
+            bJuega = true;
+        }
+        //si presiono P pausa
+        else if(ke.getKeyCode() == KeyEvent.VK_P){ 
+            bPausa = !bPausa;
         }
     }
     

@@ -1,6 +1,7 @@
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 
 /**
       La clase Animacion maneja una serie de imágenes (cuadros) 
@@ -16,7 +17,6 @@ public class Animacion {
          private long tiempoDeAnimacion;
          //Duración total de la animación
          private long duracionTotal;
-         
          private int iX;
          private int iY;
 
@@ -131,6 +131,7 @@ public class Animacion {
                         Imagen que se mostrará en pantalla cuando el cuadro este activo
                   */
                   Image imagen;
+                  
                   /**
                         Tiempo en el que se realiza la transición del cuadro actual al siguiente
                   */

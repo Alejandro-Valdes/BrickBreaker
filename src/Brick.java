@@ -50,6 +50,13 @@ public class Brick extends Objeto{
         }
     }
     /**
+     * getGolpes
+     * Metodo para obtener numero golpes
+     */
+    public int getGolpes(){
+        return iGolpes;
+    }
+    /**
      * setDestruido
      * Saber si ya se destruyo el bloque
      * @param bDestruido parametro de entrada
