@@ -137,7 +137,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         //creo imagen de Jesse PinkMan
         URL urlImagenPinkman = this.getClass().getResource("pinkman.png");
         //creo imagen de Meth
-        URL urlImagenMeth = this.getClass().getResource("Brick_BlueMethBaggie.png");
+        URL urlImagenMeth = this.getClass().getResource("meth.png");
         //creo imagen de lab
         URL urlImagenLab = this.getClass().getResource("lab.png");
         
@@ -376,11 +376,11 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
                         padDrone.getY() , this);
             }
             else if(bIzq){
-                g.drawImage(padDroneDer.getImagen(), padDrone.getX(),
+                g.drawImage(padDroneIzq.getImagen(), padDrone.getX(),
                         padDrone.getY() , this);
             }
             else if(bDer) {
-                g.drawImage(padDroneIzq.getImagen(), padDrone.getX(),
+                g.drawImage(padDroneDer.getImagen(), padDrone.getX(),
                         padDrone.getY() , this);
             }
         }
