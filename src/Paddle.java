@@ -30,7 +30,7 @@ public class Paddle extends Animacion {
      */
     public Paddle(int iX, int iY) {
         super(iX, iY);  
-        this.setVelocidad(5);
+        this.setVelocidad(6);
     }
 
     /**

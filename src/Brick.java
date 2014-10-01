@@ -101,7 +101,7 @@ public class Brick extends Objeto{
     public boolean colisionaPorAbajo(Bola bolBola){
         //Creo un rectangulo de la parte inferior del brick
         Rectangle recBrick = new Rectangle(this.getX(),
-        this.getY() + this.getAlto() - 2,this.getAncho(), 2);
+        this.getY() + this.getAlto() ,this.getAncho(), 10);
         
          // creo un objeto rectangulo a partir del objeto Bola parametro
         Rectangle recParametro = new Rectangle(bolBola.getX(),
@@ -120,7 +120,7 @@ public class Brick extends Objeto{
     public boolean colisionaPorIzq(Bola bolBola){
         //Creo un rectangulo de la parte inferior del brick
         Rectangle recBrick = new Rectangle(this.getX(),
-        this.getY(), 2, this.getAlto());
+        this.getY() + 3, 2, this.getAlto() + 6 );
         
          // creo un objeto rectangulo a partir del objeto Bola parametro
         Rectangle recParametro = new Rectangle(bolBola.getX(),

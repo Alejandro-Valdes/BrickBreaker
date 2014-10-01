@@ -32,25 +32,46 @@ public class Boss extends Brick{
        //this.iGolpes = 0;
     }
    
-    /*
-    /checar
+    /**
+     * actualizaFase
+     * metodo que va cambiando las imagenes dependiendo de los golpes
+     *
+     * @param iGolpes es el numeor de golpes que a recibido
     */
     public void actualizaFase(int iGolpes){
         if(!this.estaDestruido()){
             this.setImagen((Image) arrFases.get(iGolpes));
         }
     }
+    /**
+     * revive
+     * metodo que revive al villano para que tome otra cara
+     */
+    public void revive(){
+        if(this.estaDestruido()){
+            setDestruido(false);
+        }
+    }
     
+    /**
+     * agregaFase
+     * metodo para agregar imagenes
+     * @param imaImagen es la imagen a agregar
+     */
     public synchronized void agregaFase(Image imaImagen){
         arrFases.add(imaImagen);
     }
     
-    /*@Override
-    public void agregarGolpe(){
-        iGolpes++;
-        if(iGolpes == iVidas){
-            setDestruido(true);
+    /**
+     * borraTodo
+     * metodo que borra todas las fases del arrylist para empezar otro nivel
+     */
+    public void borraTodo(){
+        int Ii = 0;
+        this.iGolpes = 0;
+        while(arrFases.size() != 0){
+            arrFases.remove(Ii);
         }
-    }*/
+    }
    
 }

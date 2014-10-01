@@ -27,7 +27,7 @@ public class Bola extends Objeto{
      * 
      */
     public Bola(int iX, int iY, Image imaImagen) {
-        super(iX, iY, imaImagen);  
+        super(iX, iY, imaImagen); 
     }
     
     /**
@@ -37,8 +37,8 @@ public class Bola extends Objeto{
      */
     
     public void muevete() {
-        this.setX(this.getX() + iDirX);
-        this.setY(this.getY() + iDirY);
+        this.setX(this.getX() + this.getDirX());
+        this.setY(this.getY() + this.getDirY());
     }
     
     /**
@@ -59,6 +59,26 @@ public class Bola extends Objeto{
     
     public void setDirY (int iDirY){
         this.iDirY = iDirY;
+    }
+    
+    /**
+     * getDirX
+     * Metodo para obtener dirX
+     * @return iDirX 
+     */
+    
+    public int getDirX() {
+        return this.iDirX;
+    }
+    
+    /**
+     * getDirY
+     * Metodo para obtener direccion en y
+     * @return iDirY
+     */
+    
+    public int getDirY (){
+         return this.iDirY;
     }
     
     
