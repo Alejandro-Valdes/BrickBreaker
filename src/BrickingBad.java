@@ -416,6 +416,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         padDrone.setX((getWidth() / 2) - 50);
         padDrone.setY(50);
         bJuega = false;
+        iVelocidad = 4;
         //se acomoda la bola debajo de la barra
         bolBola.setY(padDrone.getY() + padDrone.getImagen().
                 getHeight(null));
@@ -727,7 +728,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
      * 
      */
     public void actualiza(){  
-            
+           
         //Controlo la barra small
         if(bShrink){
             //control barra forma small
@@ -804,6 +805,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
                 case 0: 
                     bShrink = true;
                     if(!bUnaSolaVez){
+                        padDroneSmall.setX(padDrone.getX());
                         soundShrink.play();
                     }
                     bUnaSolaVez = true;
@@ -814,6 +816,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
                     else{
                         iContador = 0;
                         bShrink = false;
+                        padDrone.setX(padDroneSmall.getX());
                         bPoder = false;
                         bUnaSolaVez = false;
                     }
@@ -840,6 +843,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
                 case 2:  //grow
                     bGrow= true;
                     if(!bUnaSolaVez){
+                        padDroneLarge.setX(padDrone.getX());
                         soundEnlarge.play();
                     }
                     bUnaSolaVez = true;
@@ -849,6 +853,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
                     }
                     else{
                         iContador = 0;
+                        padDrone.setX(padDroneLarge.getX());
                         bGrow= false;
                         bPoder = false;
                         bUnaSolaVez = false;
@@ -896,8 +901,15 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         //cambio de nivel
         if(bCambioNivel){
             bCambioNivel = false;
-            iNivel++;
-            cambioNivel();
+            if(iNivel < 5){
+                iNivel++;
+                cambioNivel();
+            }
+            else{
+                bGano = true;
+                iNivel = 1;
+            }
+            
         }
         
         //aplico cheat
@@ -930,10 +942,17 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         if(bShrink){
             if(padDroneSmall.getX()<0) {
                 padDroneSmall.setX(0);
+                if(!bJuega){
+                    bolBola.setX(20);
+                }
             }
-            else if(padDroneSmall.getX() + padDroneSmall.getImagen().getWidth(this) > 
-                    getWidth()){
-                padDroneSmall.setX(getWidth() - padDroneSmall.getImagen().getWidth(this));
+            else if(padDroneSmall.getX() + padDroneSmall.getImagen().
+                    getWidth(this) > getWidth()){
+                padDroneSmall.setX(getWidth() - padDroneSmall.getImagen().
+                        getWidth(this));
+                if(!bJuega){
+                    bolBola.setX(getWidth() - 30);
+                }
             }
 
             //Si choca la bola con el drone cambia de dir en y
@@ -947,10 +966,17 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         else if(bGrow){
             if(padDroneLarge.getX()<0) {
                 padDroneLarge.setX(0);
+                if(!bJuega){
+                    bolBola.setX(65);
+                }
             }
-            else if(padDroneLarge.getX() + padDroneLarge.getImagen().getWidth(this) > 
-                    getWidth()){
-                padDroneLarge.setX(getWidth() - padDroneLarge.getImagen().getWidth(this));
+            else if(padDroneLarge.getX() + padDroneLarge.getImagen().
+                    getWidth(this) > getWidth()){
+                padDroneLarge.setX(getWidth() - padDroneLarge.getImagen().
+                        getWidth(this));
+                if(!bJuega){
+                    bolBola.setX(getWidth() - 75);
+                }
             }
 
             //Si choca la bola con el drone cambia de dir en y
@@ -964,10 +990,16 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
             //checa la posicion del drone NORMAL para que no se salga
             if(padDrone.getX()<0) {
                 padDrone.setX(0);
+                if(!bJuega){
+                    bolBola.setX(45);
+                }
             }
             else if(padDrone.getX() + padDrone.getImagen().getWidth(this) > 
                     getWidth()){
                 padDrone.setX(getWidth() - padDrone.getImagen().getWidth(this));
+                if(!bJuega){
+                    bolBola.setX(getWidth() - 55);
+                }
             }
 
             //Si choca la bola con el drone cambia de dir en y
@@ -992,42 +1024,47 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         if(bShrink){
             if(bolBola.getY() < padDroneSmall.getY() + padDroneSmall.getImagen().
                     getHeight(null) - 10){
-                iVidas--; //resto vidas
+                /*iVidas--; //resto vidas
                 //acomodo como al principio
                 bolBola.setY(padDroneSmall.getY()+padDroneSmall.getImagen().getHeight(null));
                 bolBola.setX((getWidth() / 2) - (bolBola.getAncho() / 2));
                 padDroneSmall.setX((getWidth() / 2) - 50);
                 padDroneSmall.setY(50);
                 //empiezas a jugar una vez mas con space
-                bJuega = false;
+                bJuega = false;*/
+                bolBola.setDirY(iVelocidad);
+
             }
         }
         //si se le va la bola al drone
         else if(bGrow){
             if(bolBola.getY() < padDroneLarge.getY() + padDroneLarge.getImagen().
                     getHeight(null) - 10){
-                iVidas--; //resto vidas
+                /*iVidas--; //resto vidas
                 //acomodo como al principio
                 bolBola.setY(padDroneLarge.getY()+padDroneLarge.getImagen().getHeight(null));
                 bolBola.setX((getWidth() / 2) - (bolBola.getAncho() / 2));
                 padDroneLarge.setX((getWidth() / 2) - 50);
                 padDroneLarge.setY(50);
                 //empiezas a jugar una vez mas con space
-                bJuega = false;
+                bJuega = false;*/
+                bolBola.setDirY(iVelocidad);
+
             }
         }
         else {
             //si se le va la bola al drone grande
             if(bolBola.getY() < padDrone.getY() + padDrone.getImagen().
                     getHeight(null) - 10){
-                iVidas--; //resto vidas
+                /*iVidas--; //resto vidas
                 //acomodo como al principio
                 bolBola.setY(padDrone.getY()+padDrone.getImagen().getHeight(null));
                 bolBola.setX((getWidth() / 2) - (bolBola.getAncho() / 2));
                 padDrone.setX((getWidth() / 2) - 50);
                 padDrone.setY(50);
                 //empiezas a jugar una vez mas con space
-                bJuega = false;
+                bJuega = false;*/
+                bolBola.setDirY(iVelocidad);
             }
         }      
         
