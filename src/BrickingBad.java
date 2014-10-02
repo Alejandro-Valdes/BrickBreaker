@@ -21,6 +21,7 @@ import javax.swing.JFrame;
 /**
  *
  * @author Alejandro Valdes
+ * Jorge Gonzalez
  */
 class BrickingBad extends JFrame implements Runnable, KeyListener {
 //Cargar todas las variables que se necesitaran
@@ -158,6 +159,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         lnkBricks = new LinkedList();       //creo la lista encadenada de bricks
         lnkPowerUps = new LinkedList();     //creo la lista de powerups
         bJuega = false;     //no estoy jugando
+        
         bPausa = false;     //no estoy pausado
         bCambioNivel = false;   //no e cambiado de nivle
         bGano = false;
@@ -719,13 +721,13 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         
         while(true){
             
-            if(!bPausa){
+            if(!bPausa & iVidas > 0){
                 if(!bInicio){
                     actualiza();    
                     checaColision();
                 }
-                repaint();
             }
+           repaint();
            
             try	{  
                 // El thread se duerme.
@@ -749,13 +751,15 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
         if(bShrink){
             //control barra forma small
             if(bIzq){
-            padDroneSmall.setX(padDroneSmall.getX() - padDroneSmall.getVelociad());
+            padDroneSmall.setX(padDroneSmall.getX() - padDroneSmall.
+                    getVelociad());
                 if(!bJuega){
                     bolBola.setX(bolBola.getX() - padDroneSmall.getVelociad());
                 }
             }
             if(bDer) {
-                padDroneSmall.setX(padDroneSmall.getX() + padDroneSmall.getVelociad());
+                padDroneSmall.setX(padDroneSmall.getX() + padDroneSmall.
+                        getVelociad());
                 if(!bJuega){
                     bolBola.setX(bolBola.getX() + padDroneSmall.getVelociad());
                 }
@@ -1056,7 +1060,8 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
                 soundGroan.play();
                 iVidas--; //resto vidas
                 //acomodo como al principio
-                bolBola.setY(padDroneSmall.getY()+padDroneSmall.getImagen().getHeight(null));
+                bolBola.setY(padDroneSmall.getY()+padDroneSmall.getImagen().
+                        getHeight(null));
                 bolBola.setX((getWidth() / 2) - (bolBola.getAncho() / 2));
                 padDroneSmall.setX((getWidth() / 2) - 50);
                 padDroneSmall.setY(50);
@@ -1374,14 +1379,15 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
             }
                   
             //dibujo bloques
-            for(Object briBloque:lnkBricks) {
-                Brick briBrick = (Brick) briBloque;
-                if(!briBrick.estaDestruido()){
-                    g.drawImage(briBrick.getImagen(), briBrick.getX(), 
-                          briBrick.getY(), this);
+            if(lnkBricks.size() != 0){
+                for(Object briBloque:lnkBricks) {
+                    Brick briBrick = (Brick) briBloque;
+                    if(!briBrick.estaDestruido()){
+                        g.drawImage(briBrick.getImagen(), briBrick.getX(), 
+                              briBrick.getY(), this);
+                    }
                 }
             }
-            
             //Dibujo powerUps
             if(lnkPowerUps.size() != 0){
                 for(Object pwrUp:lnkPowerUps) {
@@ -1403,7 +1409,7 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
             g.drawString("Score: " + iScore, 10, getHeight() - 20);
             g.drawString("Lives: " + iVidas, 10, getHeight() - 40);
             g.drawString("Bricks to go: " + lnkBricks.size(),10,getHeight() 
-                    - 60);            
+                    - 60);           
         }  
         
         if(!bJuega & iVidas > 0 & !bGano & !bInicio){
@@ -1447,6 +1453,12 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
             g.drawString("Presiona ENTER para reiniciar ", 
                     (getWidth() / 2) - 135, getHeight() / 2);
         }
+        
+        if(bPausa){
+            g.setColor(Color.black);
+            g.drawString("PAUSADO ", 
+                    (getWidth() / 2) - 65, getHeight() / 2);
+        }
     }
     
     @Override
@@ -1456,10 +1468,10 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
     @Override
     public void keyPressed(KeyEvent ke) {
         //variables para saber si esta presionado o no
-        if(ke.getKeyCode() == ke.VK_LEFT){
+        if(ke.getKeyCode() == KeyEvent.VK_LEFT){
             bIzq = true;
         }
-        else if(ke.getKeyCode() == ke.VK_RIGHT){
+        else if(ke.getKeyCode() == KeyEvent.VK_RIGHT){
             bDer = true;
         }
     }
@@ -1467,37 +1479,93 @@ class BrickingBad extends JFrame implements Runnable, KeyListener {
     @Override
     public void keyReleased(KeyEvent ke) {
         //dejo de moverme cuando se suelta la flecha
-        if(ke.getKeyCode() == ke.VK_LEFT){
+        if(ke.getKeyCode() == KeyEvent.VK_LEFT){
             bIzq = false;
         }
-        else if(ke.getKeyCode() == ke.VK_RIGHT){
+        else if(ke.getKeyCode() == KeyEvent.VK_RIGHT){
             bDer = false;
         }
-        else if(ke.getKeyCode() == ke.VK_SPACE){
+        else if(ke.getKeyCode() == KeyEvent.VK_SPACE){
             if(bInicio & iInicio < 2){
                 iInicio++;
             }
             else if(iInicio == 2){
                 bInicio = false;
-                iInicio = 1;
+                iInicio = 3;
             }
             else{
                 bJuega = true;
             }
 
         }
+        
         //si presiono P pausa
         else if(ke.getKeyCode() == KeyEvent.VK_P){ 
             bPausa = !bPausa;
         }
         
         else if(ke.getKeyCode() == KeyEvent.VK_ENTER){
-            if(iVidas == 0){
-                init();
-            }     
-            if(bGano){
-                init();
-            }
+
+            if(bGano || iVidas == 0){
+                iScore = 0;     //score de 0
+                iVidas = 4;     //con 10 vidas
+                iVelocidad = 4;     //velocidad inicia con 4
+                iCada5 = 0;         //empiezas con 0
+                iNivel = 1;
+                iRandom = 0;
+                iContador = 0;      //contador en 0
+                bIzq = false;       //no me muevo
+                bDer = false;       //no me muevo
+                lnkBricks.clear();
+                lnkPowerUps.clear();
+                bJuega = false;     //no estoy jugando
+
+                bPausa = false;     //no estoy pausado
+                bCambioNivel = false;   //no e cambiado de nivle
+                bGano = false;
+
+                //PowerUps
+                bPoder = false;
+                iPoder = 0;
+                bShrink = false;
+                bUnaSolaVez = false;
+
+                //CHEAT
+                bCheat = false;
+
+                //Pantalla iniciol
+                bInicio = true;
+                iInicio = 1;
+                
+                /*********NIVEL 1********/
+                //Creo 5 filas de meth y luego a tuco
+
+                for(int iI = 0; iI < 10; iI++){
+                    Brick briBloque1 = new Brick(50 * iI, (getHeight() / 2) , 1, 
+                            Toolkit.getDefaultToolkit().
+                                    getImage(urlImagenMeth));
+                    lnkBricks.add(briBloque1);
+
+                    Brick briBloque2 = new Brick(50 * iI, (getHeight() / 2) + 20
+                            , 3, Toolkit.getDefaultToolkit().
+                                    getImage(urlImagenBarril));
+                    lnkBricks.add(briBloque2);
+
+                    Brick briBloque3 = new Brick(50 * iI, (getHeight() / 2) 
+                            + 100 , 2, Toolkit.getDefaultToolkit().
+                                    getImage(urlImagenOso));
+                    lnkBricks.add(briBloque3);
+
+                    Brick briBloque4 = new Brick(50 * iI, (getHeight() / 2) 
+                            + 140, 1, Toolkit.getDefaultToolkit().
+                                    getImage(urlImagenMeth));
+                    lnkBricks.add(briBloque4);
+                }
+
+                //agrego a tuco
+                bossVillano = new Boss(getWidth() / 2 - 50, getHeight() - 110,
+                    5, Toolkit.getDefaultToolkit().getImage(urlTuco1));
+                    }
         }
         
         //CHEAT
